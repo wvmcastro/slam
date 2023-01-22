@@ -1,0 +1,97 @@
+<launch>
+  <arg name="algorithm" />
+
+  <arg name="robot_name" default="rb1" />
+
+  <!-- 
+    When play or record are set the teleop arg nuturtle_gazebo to false
+  --> 
+  <arg name="record" default="False" 
+       doc="records a bag file with topics data" />
+
+  <arg name="teleop" default="True" doc="enable teleop turtlebot3" />
+  <arg name="play_file" default="" doc="Bag file with topics data" />
+  
+  <arg name="theta" value="0" />
+
+  <arg name="debug" default="False" doc="When true, launch node fake_landmarks instead of landmarks. The fake_landmark node reads the landmarks poisitions from the gazebo simulator instead of the laser scanner data from the sensor topic" />
+
+  <arg name="landmark_debug" default="False" doc="When true, the landmark node 
+    publishes debug info at the nuslam/debug topic and the landmarks_debug node is launched" 
+    />
+  
+  <arg name="map_size" default="12" />
+
+  <arg name="known_initial_pose" default="False" />
+
+  <arg name="standalone" default="False" />
+  <node if="$(eval standalone)" pkg="tf2_ros" type="static_transform_publisher" 
+      name="" args="$0 0 0 0 0 0 1 world $(arg robot_name)/map" />
+
+  <!-- robot launch--> 
+  <include file="$(find nuturtle_gazebo)/launch/diff_drive_gazebo.launch" 
+    pass_all_args="True" >
+    <arg name="robot_name" value="$(arg robot_name)" />
+    <arg name="teleop" 
+         value="$(eval arg('play_file') == '' and arg('teleop') == True)" />
+  </include>
+
+  <group ns="$(arg robot_name)" >
+    <param name="robot_name" value="$(arg robot_name)" />
+    <param name="laser_topic" value="scan" />
+    <param name="landmarks_topic" value="slam/measurements" />
+    <param name="map_size" value="$(arg map_size)" />
+    <param name="debug" value="$(arg debug)" />
+
+    <!-- real landmarks detector -->
+    <group if="$(eval debug == False)">
+
+      <node name="landmarks" pkg="nuslam" type="landmarks_detector" >
+        <param name="debug" value="$(arg landmark_debug)" />
+        <param name="derivative_threshold" value="5.73" />
+        <param name="cell_size" value="0.05" />
+        <param name="scan_sampling_step" value="2" />
+      </node>
+
+      <node if="$(eval landmark_debug)" 
+        name="landmarks_debug" pkg="nuslam" type="landmarks_debug.py" />
+
+    </group>
+
+    <!-- fake landmarks detector -->
+    <group if="$(eval debug == True)">
+
+      <node name="fake_landmarks" pkg="nuslam" type="fake_landmarks" />
+
+    </group>
+
+    <!-- slam -->
+    <node if="$(eval algorithm == 'seif')" name="seif_slam" 
+          pkg="nuslam" type="seif_slam" args="$(arg robot_name) 
+          $(arg known_initial_pose)">
+      <param name="cell_size" value="0.05" />
+      <param name="scan_sampling_step" value="2" />
+    </node>
+    
+    <node if="$(eval algorithm == 'ekf')" name="ekf_slam" 
+          pkg="nuslam" type="ekf_slam" args="$(arg robot_name)">
+      <param name="cell_size" value="0.05" />
+      <param name="scan_sampling_step" value="2" />
+    </node>
+    
+    <node name="$(arg robot_name)_draw_map" pkg="nuslam" type="draw_map" />
+
+    <node name="visualization" pkg="nuslam" type="visualization" />
+
+
+    <node if="$(eval play_file != '')" name="cmd_vel_player" pkg="rosbag" 
+      type="play" args="--clock $(find nuslam)/records/$(arg play_file)" 
+      required="True" /> 
+  </group>
+  
+  <node if="$(eval record == True)" name="simulation_recorder" pkg="rosbag"
+    type="record" args="-e '/gazebo(.*)|(.*)scan|(.*)joint_states' 
+      -o $(find nuslam)/records/simulantion" />
+  
+  
+</launch>

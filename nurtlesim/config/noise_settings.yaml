@@ -1,0 +1,12 @@
+# linear velocity gaussian noise parameters
+linear_velocity_mu: 0.0
+linear_velocity_sigma: 0.001
+
+# angular velocity gaussian noise parameters
+angular_velocity_mu: 0.0
+angular_velocity_sigma: 0.005
+
+# slipping noise. Simulates the wheels turning more or less than the robot
+# actually travels
+slipping_noise_min: -100.0
+slipping_noise_max: 100.0 

@@ -1,0 +1,14 @@
+<launch>
+  <arg name="robot_name" default="robot1" />
+  <arg name="algorithm" default="seif" />
+
+  <arg name="map_frame_id" default="$(arg robot_name)/map" />
+
+  <arg name="rvizconfig" default="$(find nuslam)/rviz/$(arg algorithm)-slam-config.rviz" />
+  <group ns="$(arg robot_name)" >
+    <param name="tf_prefix" value="$(arg robot_name)" />
+    <node name="rviz" pkg="rviz" type="rviz" required="true" 
+          args="-d $(arg rvizconfig) tf_prefix:=$(arg map_frame_id)" >
+    </node>
+  </group>
+</launch>

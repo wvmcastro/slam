@@ -1,0 +1,45 @@
+<launch>
+
+  <arg name="robot_name" default="robot1" />
+  <arg name="robot_x" default="0.0" />
+  <arg name="robot_y" default="0.0" />
+  
+  <arg name="odom_frame_id" default="$(arg robot_name)/odom" />
+  
+  <group ns="$(arg robot_name)" >
+    <rosparam command="load" 
+              file="$(find nuturtle_description)/config/sensor_params.yaml" />
+    <rosparam command="load" 
+              file="$(find nuturtle_description)/config/diff_drive_params.yaml" />
+    <param name="robot_description" command="xacro 
+      $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro 
+      robot_name:=$(arg robot_name)" />
+      
+    <node name="robot_state_publisher" pkg="robot_state_publisher"
+        type="robot_state_publisher" >
+      <param name="tf_prefix" value="$(arg robot_name)" />
+    </node>
+    
+    <node name="spawn_robot" pkg="gazebo_ros" type="spawn_model"
+      args="-urdf -param robot_description -x $(arg robot_x) -y $(arg robot_y) 
+      -model $(arg robot_name)" >
+    </node>
+
+    <arg name="body_frame_id" default="$(arg robot_name)/base_footprint" />
+    <arg name="publish_tf" default="true" />
+    <node name="odometer" pkg="rigid2d" type="odometry_node">
+      <param name="publish_tf" type="bool" value="$(arg publish_tf)" />
+      <param name="odom_frame_id" type="string" value="$(arg odom_frame_id)" />
+      <param name="body_frame_id" type="string" value="$(arg body_frame_id)" />
+    </node>
+  </group>
+
+  <arg name="teleop" default="true" doc="Launch or not the turtlebot3 keyboard 
+    teleop node"/>
+  <node if="$(eval teleop == True)" name="$(arg robot_name)_teleop_keyboard" 
+        pkg="turtlebot3_teleop" type="turtlebot3_teleop_key" 
+        required="true" output="screen" >
+    <remap from="cmd_vel" to="$(arg robot_name)/cmd_vel" />
+  </node>
+
+</launch>

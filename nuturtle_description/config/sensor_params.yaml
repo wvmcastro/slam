@@ -1,0 +1,3 @@
+laser_update_rate: 5 # hz
+laser_stddev: 0.005
+laser_max_range: 2

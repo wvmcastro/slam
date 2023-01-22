@@ -1,0 +1,40 @@
+<launch>
+  <arg name="model" 
+    default="$(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro" />
+  <param name="robot_description" command="xacro $(arg model)" />
+  <param name="laser_topic" value="scan" />
+  <param name="landmarks_topic" value="nuslam/landmarks" />
+
+  <arg name="debug" default="false" doc="When true, the landmark node 
+    publishes debug info at the nuslam/debug topic and the landmarks_debug node is launched" 
+    />
+
+  <node name="odom_to_map_transform" pkg="tf2_ros" 
+        type="static_transform_publisher" args="0 -2.0 0 0 0 0 1 map odom" />
+    
+  <node name="robot_state_publisher" pkg="robot_state_publisher"
+        type="robot_state_publisher" >
+  </node>
+  
+  <arg name="theta" value="0" />
+  <include file="$(find nuturtle_gazebo)/launch/diff_drive_gazebo.launch" >
+    <arg name="world" 
+         value="$(find turtlebot3_gazebo)/worlds/turtlebot3_world.world" />
+    <arg name="robot_y" value="-2.0" /> 
+    <arg name="publish_tf" value="true" />
+    <arg name="body_frame_id" value="base_footprint" />
+    <arg name="rvizconfig" value="$(find nuslam)/rviz/landmarks-config.rviz" />
+  </include>
+  
+  <node name="landmarks" pkg="nuslam" type="landmarks_detector" >
+    <param name="debug" value="$(arg debug)" />
+    <param name="derivative_threshold" value="8.594366927" />
+    <param name="cylinder_size_threshold" value="1.0" />
+  </node>
+  
+  <node name="draw_map" pkg="nuslam" type="draw_map" />
+  
+  <node if="$(eval debug)" 
+    name="landmarks_debug" pkg="nuslam" type="landmarks_debug.py" />
+    
+</launch>

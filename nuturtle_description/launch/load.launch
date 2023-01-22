@@ -1,0 +1,19 @@
+<launch>
+  <rosparam command="load" 
+            file="$(find nuturtle_description)/config/sensor_params.yaml" />
+  <rosparam command="load" 
+            file="$(find nuturtle_description)/config/diff_drive_params.yaml" />
+
+  <param name="robot_description" command="xacro 
+    $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro " />
+ 
+  <arg name="use_rviz" default="true" 
+    doc="controls whether rviz and the joint_state_publisher is launched" />
+
+  <node if="$(arg use_rviz)" name="rviz" pkg="rviz" type="rviz"
+    args="-d $(find nuturtle_description)/rviz/model.rviz" required="true" /> 
+
+  <node if="$(arg use_rviz)" name="joint_state_publisher" 
+    pkg="joint_state_publisher" type="joint_state_publisher" />
+
+</launch>

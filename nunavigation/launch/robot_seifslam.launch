@@ -1,0 +1,43 @@
+<launch>
+  <arg name="robot_name" default="rb1" />
+  <arg name="ox" default="0" />
+  <arg name="oy" default="0" />
+  <arg name="rviz" default="False" />
+
+  <arg name="record" value="False" />
+  <arg name="teleop" value="False" />
+  <arg name="debug" value="False" />
+  <arg name="algorithm" value="seif" />
+  <arg name="record_experiment_data" default="False" />
+  <arg name="record_path" default="/home/wellington" />
+
+  <include file="$(find nunavigation)/launch/move_base.launch" 
+    pass_all_args="true" />
+
+  <include file="$(find nunavigation)/launch/explorer.launch" 
+    pass_all_args="true" />
+  
+  <include file="$(find nuslam)/launch/slam.launch" pass_all_args="true" >
+    <arg name="robot_x" value="$(arg ox)" />
+    <arg name="robot_y" value="$(arg oy)" />
+  </include>
+
+  <group ns="$(arg robot_name)">
+    <node pkg="tf2_ros" type="static_transform_publisher" 
+      name="" args="$(arg ox) $(arg oy) 0 0 0 0 1 world $(arg robot_name)/map" />
+    
+    <node name="occupancy_gridmap_maker" pkg="occupancy_grid_map"
+      type="map_maker" args="$(arg robot_name)/map" >
+      <param name="cell_size" value="0.05" />
+      <param name="scan_sampling_step" value="2" />
+    </node>
+
+  </group>
+
+  <node if="$(eval record_experiment_data)" name="area_coverave_recorder_$(arg robot_name)" pkg="utils" 
+    type="grid_map_listener_node.py" args="$(arg robot_name) $(arg record_path)" />
+ 
+  <node if="$(eval record_experiment_data)" name="path_recorder_$(arg robot_name)" pkg="utils" 
+    type="record_true_and_slam_path_node.py" args="$(arg robot_name) $(arg record_path)" />
+
+</launch>

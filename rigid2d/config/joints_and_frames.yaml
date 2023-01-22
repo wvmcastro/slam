@@ -1,0 +1,5 @@
+wheel_base: 0.033 
+wheel_radius: 0.16 
+left_wheel_joint: "wheel_left_joint"
+right_wheel_joint: "wheel_right_joint"
+

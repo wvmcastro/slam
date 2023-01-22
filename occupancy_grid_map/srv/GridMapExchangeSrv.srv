@@ -1,0 +1,3 @@
+string robot_id
+---
+nav_msgs/OccupancyGrid map

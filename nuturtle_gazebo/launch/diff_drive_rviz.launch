@@ -1,0 +1,10 @@
+<launch>
+  <arg name="robot_name" default="robot1" />
+  <arg name="odom_frame_id" default="$(arg robot_name)/odom" />
+
+  <arg name="rvizconfig" default="$(find nuturtle_gazebo)/rviz/config.rviz" />
+  <node name="rviz" pkg="rviz" type="rviz" required="true" 
+        args="-d $(arg rvizconfig) --fixed-frame $(arg odom_frame_id)" >
+    <remap from="odom" to="$(arg robot_name)/odom" />
+  </node>
+</launch>

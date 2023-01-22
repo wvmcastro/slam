@@ -1,0 +1,34 @@
+<launch>
+  <arg name="robot_name" default="rb1" />
+
+  <arg name="model" value="burger" />
+  <group ns="$(arg robot_name)">
+    <node pkg="move_base" type="move_base" respawn="false" name = "move_base" output="screen">
+      <rosparam file="$(find nunavigation)/config/move_base_params.yaml" command="load" />
+
+      <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+      <rosparam file="$(find nunavigation)/config/dwa_local_planner_params_$(arg model).yaml" command="load" />
+
+      <rosparam file="$(find nunavigation)/config/costmap_common_params_$(arg model).yaml" command="load" ns="global_costmap" />
+      <rosparam file="$(find nunavigation)/config/costmap_common_params_$(arg model).yaml" command="load" ns="local_costmap" />
+
+      <rosparam file="$(find nunavigation)/config/local_costmap_params.yaml" command="load" />
+      <rosparam file="$(find nunavigation)/config/global_costmap_params.yaml" command="load" />
+
+      <param name="global_costmap/global_frame" value="$(arg robot_name)/map" />
+      <param name="global_costmap/robot_base_frame" value="$(arg robot_name)/base_footprint" />
+      <param name="global_costmap/laser_scan_sensor/sensor_frame" value="$(arg robot_name)/base_scan" />
+
+      <param name="local_costmap/robot_base_frame" value="$(arg robot_name)/base_footprint" />
+      <param name="local_costmap/laser_scan_sensor/sensor_frame" value="$(arg robot_name)/base_scan" />
+      <param name="local_costmap/global_frame" value="$(arg robot_name)/odom" />
+
+      <!-- <remap from="scan" to="" /> -->
+    </node>
+
+    <!--  Changes move base log level to ERROR -->
+    <node pkg="rosservice" type="rosservice" name="set_move_base_log_level" 
+      args="call --wait move_base/set_logger_level ros error" />
+
+  </group>
+</launch>

@@ -1,0 +1,12 @@
+<launch>
+  <arg name="robot_name" default="rb1" />
+  <arg name="algorithm" default="seif" />
+
+  <arg name="rvizconfig" default="$(find nunavigation)/rviz/navigation-seif.rviz" />
+  <group ns="$(arg robot_name)" >
+    <param name="tf_prefix" value="$arg robot_name)" />
+    <node name="rviz" pkg="rviz" type="rviz" required="true" 
+          args="-d $(arg rvizconfig) --fixed-frame world" >
+    </node>
+  </group>
+</launch>

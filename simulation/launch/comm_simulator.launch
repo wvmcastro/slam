@@ -1,0 +1,7 @@
+<launch>
+  <arg name="communication_range" />
+  <arg name="robots" />
+
+  <node name="communication_simulator" pkg="simulation" 
+    type="communication_simulator.py" args="$(arg communication_range) $(arg robots)" />
+</launch>

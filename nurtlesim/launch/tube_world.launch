@@ -1,0 +1,24 @@
+<launch>
+  <rosparam command="load" 
+            file="$(find nurtlesim)/config/joints_and_frames.yaml" />
+
+  <node name="odometer" pkg="rigid2d" type="odometry_node">
+    <param name="publish_tf" type="bool" value="true" />
+    <param name="odom_frame_id" type="string" value="world_static_frame" />
+    <param name="body_frame_id" type="string" value="body_frame" />
+  </node>
+
+  <node name="tube_world_node" pkg="nurtlesim" type="tube_world" >
+    <rosparam command="load" 
+              file="$(find nurtlesim)/config/noise_settings.yaml" />
+    <param name="frequency" type="double" value="60" />
+  </node>
+
+  <node name="turtlebot3_teleop_keyboard" pkg="turtlebot3_teleop" 
+        type="turtlebot3_teleop_key" required="true" output="screen" />
+
+  <arg name="rvizconfig" default="$(find rigid2d)/rviz/config.rviz" />
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" 
+        required="true"/>
+  
+</launch>
