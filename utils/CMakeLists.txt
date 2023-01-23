@@ -177,7 +177,6 @@ target_link_libraries(pointcloud_registration_demo
 catkin_install_python(PROGRAMS
   src/experiments_utils/grid_map_listener_node.py
   src/experiments_utils/record_true_and_slam_path_node.py
-  src/experiments_utils/record_true_and_slam_path_node_v1.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
