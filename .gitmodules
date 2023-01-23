@@ -1,0 +1,3 @@
+[submodule "nuturtlebot"]
+	path = nuturtlebot
+	url = https://github.com/wvmcastro/nuturtlebot.git
