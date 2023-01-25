@@ -71,7 +71,7 @@ private:
 
         float fitness_error = landmark(3);
         float radius = landmark(2);
-        if(fitness_error < 1e-3 && radius > 0.065)
+        if(fitness_error < 1e-3 && radius > 0.065 && radius < 0.1)
         {
           math::cartesianToPolar(landmark.data());
           landmarks.push_back(landmark);
