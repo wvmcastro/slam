@@ -35,7 +35,7 @@ class AreaCoverageMonitor:
     self.state.occupancy_grid = msg
     
     t, area = self.state.data
-    t.append(time.time())
+    t.append(rospy.Time.now().to_sec())
     area.append(get_area(msg))
 
   def covered_area(self) -> float:
