@@ -10,8 +10,9 @@ from argparse import ArgumentParser
 import yaml
 from datetime import datetime
 import json
+from time import sleep, time
+from random import seed
 
-from time import time, sleep
 import rospy
 import tf2_ros
 
@@ -84,7 +85,7 @@ def get_robot_initial_random_position(positions):
     y = random.randint(range_min, range_max) / 10.0
     pos = np.array([x,y])
     min_d = get_min_distance(pos, positions)
-    if min_d > 0.7:
+    if min_d > 0.8:
       return pos
 
 def launch_rviz(robot_name):
@@ -178,7 +179,7 @@ class SimulationMonitor:
     self.listener = tf2_ros.TransformListener(self.tfBuffer)
 
     self.init_monitors(robots)
-    self.t0 = time()
+    self.t0 = rospy.Time.now()
 
     self.robot_position_error_th = 1 # one meter
     self.count = 0
@@ -198,22 +199,22 @@ class SimulationMonitor:
     return area_covered
   
   def failure(self) -> bool:
-    dt = time() - self.t0
+    dt = (rospy.Time.now() - self.t0).to_sec()
 
-    max_simulation_time = 60*15 # 15min
+    max_simulation_time = 60*17 # 15min
     if dt >= max_simulation_time:
       self.failure_reason = "time limit exceeded"
       return True
 
-    '''for monitor in self.pose_monitors:
+    for monitor in self.pose_monitors:
       error = monitor.slam_error(-1)
       if error > self.robot_position_error_th:
-        rospy.logerr(f"error: {error}")
-        rospy.logerr(f"slam prev: {monitor.poses.slam[-2].position} slam current: {monitor.poses.slam[-1].position}")
-        rospy.logerr(f"true prev: {monitor.poses.true[-2].position} true current: {monitor.poses.true[-1].position}")
+        # rospy.logwarn(f"error: {error}")
+        # rospy.logwarn(f"slam poses: {[(pose.position.x, pose.position.y) for pose in monitor.poses.slam[-10:]]}")
+        # rospy.logwarn("")
+        # rospy.logwarn(f"true prev: {[(pose.position.x, pose.position.y) for pose in monitor.poses.true[-10:]]}")
         self.failure_reason = "robot position error too large"
         return True
-      '''
 
     return False
 
@@ -238,10 +239,9 @@ class SimulationMonitor:
       
       self.simulation_launcher.spin_once()  
     
-    self.simulation_launcher.shutdown()
     
     info["status"] = status
-    info["total_time"] = time() - self.t0
+    info["total_time"] = (rospy.Time.now() - self.t0).to_sec()
 
     if status == "success":
       info["statistics"] = {}
@@ -251,50 +251,43 @@ class SimulationMonitor:
 
 
 if __name__ == "__main__":
+  seed(time())
   args_parser = get_args_parser()
   args = args_parser.parse_args()
   
+  rospy.init_node("simulator")
 
-  simulation = 0
+  with open(args.config_file, "r") as f:
+    config = yaml.safe_load(f)
+  workspace = prepare_workspace(config['output_folder'])
+  
+  info = {}
+  info["setup"] = {}
+  robots_launch = launch_robots(config["robots"], info["setup"], workspace)
 
-  while simulation < 1:
-    # sleep(60)
-    with open(args.config_file, "r") as f:
-      config = yaml.safe_load(f)
-    workspace = prepare_workspace(config['output_folder'])
-    
-    info = {}
-    info["setup"] = {}
-    robots_launch = launch_robots(config["robots"], info["setup"], workspace)
+  # gazebo_launch = launch_simulator(paused="False", gui="False")
+  # topics_recorder_launch = launch_topics_recorder(workspace)
 
-    gazebo_launch = launch_simulator(paused="False", gui="True")
-    topics_recorder_launch = launch_topics_recorder(workspace)
-
-    launcher = get_launcher([gazebo_launch, *robots_launch,\
-      topics_recorder_launch]) 
+  launcher = get_launcher([*robots_launch]) 
 
 
-    launcher.start()
-    sleep(10)
+  launcher.start()
+  sleep(10)
+  
+  robots_names = [robot["name"] for robot in config["robots"]] 
+  comm_simulator = CommunicationSimulator(robots_names, config["communication_range"])
+  
+  rospy.logdebug("simulation started") 
 
-    rospy.init_node("simulator")
-    
-    robots_names = [robot["name"] for robot in config["robots"]] 
-    comm_simulator = CommunicationSimulator(robots_names, config["communication_range"])
-    
-    rospy.logdebug("simulation started") 
+  info["simulation_result"] = {}
+  simulation_monitor = SimulationMonitor(launcher, robots_names, 90)
+  simulation_monitor.run(info["simulation_result"])
+  
+  rospy.logdebug("simulation finished") 
+  
+  save_info(workspace, info) 
 
-    info["simulation_result"] = {}
-    simulation_monitor = SimulationMonitor(launcher, robots_names, 90)
-    simulation_monitor.run(info["simulation_result"])
-    
-    rospy.logdebug("simulation finished") 
-    
-    save_info(workspace, info) 
+  del simulation_monitor
+  launcher.shutdown()
 
-    del comm_simulator
-    
-    rospy.logerr(f"simulation: {simulation}")
-    rospy.signal_shutdown("simulation ended")
-    print("simulation", simulation)
-    simulation += 1
+  rospy.signal_shutdown("shutdown")
