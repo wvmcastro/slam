@@ -168,7 +168,8 @@ SEIFSlamDiffDrive::update(
   for(auto idx: uninitialized_landmarks)
   {
     uint16_t id = initLandmark(measurements[idx]);
-    _all_landmarks_manager.insertCandidate(id);
+    if(id != std::numeric_limits<uint16_t>::max())
+      _all_landmarks_manager.insertCandidate(id);
   }
   
   // update robot drive state
