@@ -123,10 +123,12 @@ include_directories(
 add_library(math_utils
   src/math_utils/math.cpp
 )
+add_dependencies(math_utils ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_library(misc_utils
   src/misc_utils/misc.cpp
 )
+add_dependencies(misc_utils ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_library(pointcloud_utils
   src/pointcloud_utils/pointcloud.cpp
@@ -212,6 +214,7 @@ catkin_install_python(PROGRAMS
 ## Testing ##
 #############
 catch_add_test(bresenham_tests tests/bresenham_test.cpp)
+target_link_libraries(bresenham_tests math_utils)
 
 ## Add gtest based cpp test target and link libraries
 # catkin_add_gtest(${PROJECT_NAME}-test test/test_math_utils.cpp)

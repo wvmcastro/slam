@@ -156,6 +156,7 @@ add_library(nuslam
             src/nuslam/seif_utils.cpp
             src/nuslam/landmarks_manager.cpp
             )
+add_dependencies(nuslam ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 
 catkin_package(INCLUDE_DIRS include
@@ -175,14 +176,18 @@ add_dependencies(nuslam ${${PROJECT_NAME}_EXPORTED_TARGETS})
 # end lib creation
 
 add_executable(landmarks_detector src/landmarks.cpp)
+add_dependencies(landmarks_detector ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_include_directories(landmarks_detector PUBLIC include/)
 
 add_executable(draw_map src/draw_map.cpp)
+add_dependencies(draw_map ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_executable(visualization src/visualization.cpp)
+add_dependencies(visualization ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_include_directories(visualization PUBLIC include/)
 
 add_executable(fake_landmarks src/fake_landmarks.cpp)
+add_dependencies(fake_landmarks ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_executable(ekf_slam src/ekf_slam.cpp)
 target_link_libraries(ekf_slam
