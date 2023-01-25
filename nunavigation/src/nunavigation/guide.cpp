@@ -93,7 +93,7 @@ uint32_t
 Guide::get_neighborhood_padding(double grid_resolution) const
 {
   constexpr double cylinder_radius = 0.08;
-  constexpr double inflation_radius = 0.5;
+  constexpr double inflation_radius = 0.3;
   uint32_t padding = 
     (uint32_t) ((inflation_radius + cylinder_radius) / grid_resolution);
   return padding;
