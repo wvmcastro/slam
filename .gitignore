@@ -51,3 +51,4 @@ qtcreator-*
 CATKIN_IGNORE
 
 simulation/config/*.yml
+nohup.out
