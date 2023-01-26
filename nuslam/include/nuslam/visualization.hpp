@@ -33,9 +33,13 @@ public:
   {
     init();
 
-    ros::service::waitForService(gazebo_world_props_service);
-    _landmarks_pub_scheduler = _nh.createTimer(ros::Duration(10),
+    bool service_available = 
+      ros::service::waitForService(gazebo_world_props_service, ros::Duration(10));
+    if(service_available == true)
+    {
+      _landmarks_pub_scheduler = _nh.createTimer(ros::Duration(10),
         &Visualization::publishRealMap, this);
+    }
     
     _gazebo_model_states_sub = _nh.subscribe("/gazebo/model_states", 1, 
         &Visualization::publishRealPath, this);
