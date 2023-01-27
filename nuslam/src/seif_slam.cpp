@@ -33,14 +33,19 @@ int main(int argc, char** argv)
   nh.getParam("laser_stddev", sigma);
   Eigen::DiagonalMatrix<double, 2> measurement_noise(sigma, sigma); 
 
-  uint16_t active_set_size = 4;
+  int active_set_size;
+  {
+    ros::NodeHandle _nh("~");
+    _nh.getParam("active_landmarks_set_size", active_set_size);
+  }
+  ROS_WARN_STREAM("active landmarks set size: " << (uint16_t) active_set_size);
   
   nuslam::NuslamSystem system{x0, wheel_base, wheel_radius};
   nuslam::SEIFSlamDiffDrive seif(system,
                                x0, info0, 
                                process_noise, measurement_noise,
                                map_size,
-                               active_set_size);
+                               (uint16_t) active_set_size);
                                
   
   auto slam = Slam(seif, robot_name, known_initial_pose == "true");

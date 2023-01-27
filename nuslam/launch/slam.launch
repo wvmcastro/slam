@@ -24,6 +24,8 @@
 
   <arg name="known_initial_pose" default="False" />
 
+  <arg name="seif_active_set_size" default="4" />
+
   <arg name="standalone" default="False" />
   <node if="$(eval standalone)" pkg="tf2_ros" type="static_transform_publisher" 
       name="" args="$0 0 0 0 0 0 1 world $(arg robot_name)/map" />
@@ -69,14 +71,12 @@
     <node if="$(eval algorithm == 'seif')" name="seif_slam" 
           pkg="nuslam" type="seif_slam" args="$(arg robot_name) 
           $(arg known_initial_pose)">
-      <param name="cell_size" value="0.05" />
-      <param name="scan_sampling_step" value="2" />
+      <param name="active_landmarks_set_size" 
+        value="$(arg seif_active_set_size)" />
     </node>
     
     <node if="$(eval algorithm == 'ekf')" name="ekf_slam" 
           pkg="nuslam" type="ekf_slam" args="$(arg robot_name)">
-      <param name="cell_size" value="0.05" />
-      <param name="scan_sampling_step" value="2" />
     </node>
     
     <node name="$(arg robot_name)_draw_map" pkg="nuslam" type="draw_map" />
@@ -90,7 +90,7 @@
   </group>
   
   <node if="$(eval record == True)" name="simulation_recorder" pkg="rosbag"
-    type="record" args="-e '/gazebo(.*)|(.*)scan|(.*)joint_states' 
+    type="record" args="-e '(.*)slam/measurements|(.*)joint_states' 
       -o $(find nuslam)/records/simulantion" />
   
   
