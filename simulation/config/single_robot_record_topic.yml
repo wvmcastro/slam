@@ -1,0 +1,9 @@
+output_folder: ""
+communication_range: 2
+record_topics: 
+  enabled: yes
+  topics: "(.*)slam/measurements|(.*)joint_states"
+robots:
+  - name: rb1
+    rviz: yes
+    informe_initial_pose: no
