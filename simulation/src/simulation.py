@@ -24,14 +24,47 @@ from communication_simulator import CommunicationSimulator
 from experiments_utils.grid_map_listener import AreaCoverageMonitor
 from experiments_utils.record_true_and_slam_path import RobotPoseMonitor
 
-def launch_robot(robot_name, x, y, record_path, known_initial_pose=False, map_size=50):
+class RobotLaunchParameters:
+  def __init__(self, robot_config:dict):
+    self.robot_name = "rb1"
+    self.initial_position = (0,0)
+    self.known_initial_pose = False
+    self.map_size = 50
+    self.active_landmarks_set = None
+    self.load_config(robot_config)
+  
+  def load_config(self, robot_config: dict) -> None:
+    self.robot_name = robot_config["name"]
+    self.initial_position = tuple(robot_config["initial_position"])
+    self.known_initial_pose = robot_config["informe_initial_pose"]
+
+    if "map_size" in robot_config:
+      self.map_size = robot_config["map_size"]
+    
+    if "active_landmarks_set" in robot_config:
+      self.active_landmarks_set = robot_config["active_landmarks_set"]
+  
+  def get(self) -> dict:
+    return {
+      "name": self.robot_name,
+      "initial_position": list(self.initial_position),
+      "informe_initial_pose": self.known_initial_pose,
+      "map_size": self.map_size,
+      "active_landmarks_set": self.active_landmarks_set
+    }
+
+def launch_robot(params: RobotLaunchParameters, record_path):
   pkg = "nunavigation"
   launch_file = "robot_seifslam.launch"
 
-  cli_args = [pkg, launch_file, f"map_size:={map_size}",\
-    f"robot_name:={robot_name}", f"ox:={x}", f"oy:={y}",\
-      f"known_initial_pose:={known_initial_pose}",
+  cli_args = [pkg, launch_file, f"map_size:={params.map_size}",\
+    f"robot_name:={params.robot_name}", f"ox:={params.initial_position[0]}",\
+      f"oy:={params.initial_position[1]}",\
+      f"known_initial_pose:={params.known_initial_pose}",\
       "record_experiment_data:=True", f"record_path:={record_path}"]
+
+  if params.active_landmarks_set is not None:
+    cli_args.append(f"seif_active_set_size:={params.active_landmarks_set}") 
 
   return launch_file_and_args(cli_args)
 
@@ -119,20 +152,18 @@ def launch_robots(robots_configs, info, record_path):
   for robot_config in robots_configs:
     rb_pos = get_robot_initial_random_position(positions)
     positions = np.vstack([positions, rb_pos])
-    
-    robot = robot_config["name"]
-    robots_launch_files.append(launch_robot(robot, *rb_pos, record_path,\
-      robot_config["informe_initial_pose"]))
+
+    robot_config["initial_position"] = rb_pos
+    print(rb_pos)
+    print(robot_config["initial_position"])
+    params = RobotLaunchParameters(robot_config)
+    robots_launch_files.append(launch_robot(params, record_path))
 
     if robot_config["rviz"] == True:
-      robots_launch_files.append(launch_rviz(robot))
+      robots_launch_files.append(launch_rviz(params.robot_name))
     
-    info['robots'].append({
-      "name": robot,
-      "initial_position": list(rb_pos),
-      "rviz": False,
-      "informe_initial_pose": robot_config["informe_initial_pose"]
-    })
+    info['robots'].append(params.get())
+    info['robots'][-1]["rviz"] = False
 
   return tuple(robots_launch_files)
 
