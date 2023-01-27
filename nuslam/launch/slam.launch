@@ -2,6 +2,8 @@
   <arg name="algorithm" />
 
   <arg name="robot_name" default="rb1" />
+  <arg name="robot_x" default="0" />
+  <arg name="robot_y" default="0" />
 
   <!-- 
     When play or record are set the teleop arg nuturtle_gazebo to false
@@ -28,7 +30,7 @@
 
   <arg name="standalone" default="False" />
   <node if="$(eval standalone)" pkg="tf2_ros" type="static_transform_publisher" 
-      name="" args="$0 0 0 0 0 0 1 world $(arg robot_name)/map" />
+      name="" args="$(arg robot_x) $(arg robot_y) 0 0 0 0 1 world $(arg robot_name)/map" />
 
   <!-- robot launch--> 
   <include file="$(find nuturtle_gazebo)/launch/diff_drive_gazebo.launch" 
