@@ -159,12 +159,15 @@ def save_info(workspace, info):
     json_str = json.dumps(info, indent=2)
     f.write(json_str)
 
-def launch_topics_recorder(workspace):
+def launch_topics_recorder(workspace,
+    topics: str='(.*)slam/measurements|(.*)joint_states'):
   pkg = "simulation"
   launch_file = "recorder.launch"
 
   record_path = os.path.join(workspace, 'topics')
-  cli_args = [pkg, launch_file, f"record_path:={record_path}"]  
+  cli_args = [pkg, launch_file, f"record_path:={record_path}",\
+    f"topics:={topics}"]  
+
   return launch_file_and_args(cli_args)
 
 class SimulationMonitor:
@@ -257,21 +260,30 @@ if __name__ == "__main__":
     config = yaml.safe_load(f)
   workspace = prepare_workspace(config['output_folder'])
   
+  launch_files = []
+
+  if "record_topics" in config:
+    if config["record_topics"]["enabled"] == True:
+      topics_recorder_launch = launch_topics_recorder(workspace)
+      launch_files.append(topics_recorder_launch)
+  
   info = {}
   info["setup"] = {}
   robots_launch = launch_robots(config["robots"], info["setup"], workspace)
+  launch_files += robots_launch
 
   # gazebo_launch = launch_simulator(paused="False", gui="False")
-  # topics_recorder_launch = launch_topics_recorder(workspace)
 
-  launcher = get_launcher([*robots_launch]) 
+  launcher = get_launcher(launch_files) 
 
 
   launcher.start()
   sleep(10)
   
   robots_names = [robot["name"] for robot in config["robots"]] 
-  comm_simulator = CommunicationSimulator(robots_names, config["communication_range"])
+  comm_range = config["communication_range"]
+  comm_simulator = CommunicationSimulator(robots_names, comm_range)
+  info["setup"]["comm_range"] = comm_range
   
   rospy.logdebug("simulation started") 
 

@@ -1,7 +1,8 @@
 <launch>
   <arg name="record_path" doc="folder where the bag file will be stored" />
+  <arg name="topics" default="(.*)slam/measurements|(.*)joint_states" />
+
   <node name="simulation_recorder" pkg="rosbag"
-    type="record" args="-e '/gazebo/model_states|(.*)scan|(.*)joint_states' 
-      -o $(arg record_path)" />
+    type="record" args="-e '$(arg topics)' -o $(arg record_path)" />
   
 </launch>
