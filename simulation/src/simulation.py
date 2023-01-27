@@ -209,10 +209,6 @@ class SimulationMonitor:
     for monitor in self.pose_monitors:
       error = monitor.slam_error(-1)
       if error > self.robot_position_error_th:
-        # rospy.logwarn(f"error: {error}")
-        # rospy.logwarn(f"slam poses: {[(pose.position.x, pose.position.y) for pose in monitor.poses.slam[-10:]]}")
-        # rospy.logwarn("")
-        # rospy.logwarn(f"true prev: {[(pose.position.x, pose.position.y) for pose in monitor.poses.true[-10:]]}")
         self.failure_reason = "robot position error too large"
         return True
 
