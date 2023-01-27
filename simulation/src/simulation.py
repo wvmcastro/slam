@@ -201,7 +201,7 @@ class SimulationMonitor:
   def failure(self) -> bool:
     dt = (rospy.Time.now() - self.t0).to_sec()
 
-    max_simulation_time = 60*17 # 15min
+    max_simulation_time = 60*17 # 17min
     if dt >= max_simulation_time:
       self.failure_reason = "time limit exceeded"
       return True
