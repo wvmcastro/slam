@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
 import rospy
-import rospkg
 import os
 import numpy as np
-from xml.dom import minidom
 import random
 from argparse import ArgumentParser
 import yaml
@@ -69,14 +67,6 @@ def launch_robot(params: RobotLaunchParameters, record_path):
   return launch_file_and_args(cli_args)
 
 
-def get_world_file():
-  rospack = rospkg.RosPack()
-
-  nunavigation_path = rospack.get_path("nunavigation")
-  world_path = os.path.join(nunavigation_path, "worlds", "big-block.world")
-
-  return world_path
-
 def launch_simulator(paused:str = "True", gui: str="True"):
   world_path = get_world_file()
 
@@ -87,22 +77,6 @@ def launch_simulator(paused:str = "True", gui: str="True"):
   
   return launch_file_and_args(cli_args)
 
-def get_landmarks_positions():
-  world_file = get_world_file()
-  world_xml = minidom.parse(world_file)
-
-  positions = []
-  models = world_xml.getElementsByTagName('state')[0].getElementsByTagName('model')
-  for model in models:
-    model_name = model.attributes['name'].value
-    if "cylinder" in model_name:
-      pose_element = model.getElementsByTagName('pose')[0]
-      pose = pose_element.firstChild.nodeValue.split()
-      x = float(pose[0])
-      y = float(pose[1])
-      positions.append((x,y))
-  
-  return np.array(positions)
 
 def get_min_distance(point:np.ndarray, points_set:np.ndarray):
   diff = points_set - point
