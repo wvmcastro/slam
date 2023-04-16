@@ -12,7 +12,7 @@ In this comparsion video the robot was teleoperated in gazebo and the control in
 
 
 ---
-### TODO
+## TODO
  - [ ] Videos
  - [ ] Docker image 
  - [ ] CLI examples
