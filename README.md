@@ -6,7 +6,7 @@ This repo contains the code developed through my master's dissertation (avaiable
 ## Demonstration
 
 ### EKF-SLAM and EIF-SLAM
-In this comparsion video the robot was teleoperated in gazebo and the control inputs were recorded in a rosbag file, then both EKF-SLAM and EIF-SLAM algorithms were both fed with these inputs.
+In this comparison video the robot was teleoperated in gazebo and the control inputs were recorded in a rosbag file, then both EKF-SLAM and EIF-SLAM algorithms were both fed with these inputs.
 
 [![Watch the video](https://user-images.githubusercontent.com/12619298/232341967-4dd16944-a9e9-4d41-ac31-15cfefebd8fe.png)](https://www.youtube.com/watch?v=X6Tk1kcKhoI)
 
