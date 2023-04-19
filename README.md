@@ -14,6 +14,12 @@ In this comparison video the robot was teleoperated in gazebo and the control in
 Gazebo and RViz view of teleoperated robot running SEIF-SLAM estimation, with active landmarks set of size 4
 [![Watch the video](https://user-images.githubusercontent.com/12619298/232776794-fc6a168b-2801-491c-92a4-f5b5e6302ce4.png)](https://www.youtube.com/watch?v=EpC5KOj4ka0)
 
+### Active SLAM
+RViz view of the robot using ROS 1 Navigation stack and running a frontier-based exploration algorithm, Sparse Extended Information Filter is used for SLAM state estimation.
+
+[![Watch the video](https://user-images.githubusercontent.com/12619298/233078495-cb4df1de-a1e1-42be-b869-a7fee1a90894.png)](https://www.youtube.com/watch?v=jofORd02w0c)
+
+
 ---
 ## TODO
  - [ ] Videos
