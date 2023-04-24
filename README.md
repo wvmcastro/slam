@@ -21,7 +21,7 @@ RViz view of the robot using ROS 1 Navigation stack and running a frontier-based
 
 ### SEIF-SLAM Maps Exchange
 
-Exchange between two robots of theirs information vectors and matrices, alongside with the occupancy grid map
+Exchange between two robots of their information vectors and matrices, alongside with the occupancy grid map
 
 [![Watch the video](https://user-images.githubusercontent.com/12619298/233991362-912b6276-47c3-4d01-8b60-3b8de9a5cb6c.png)](https://youtu.be/h3TKFug_y1M)
 
