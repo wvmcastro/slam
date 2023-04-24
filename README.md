@@ -19,9 +19,14 @@ RViz view of the robot using ROS 1 Navigation stack and running a frontier-based
 
 [![Watch the video](https://user-images.githubusercontent.com/12619298/233078495-cb4df1de-a1e1-42be-b869-a7fee1a90894.png)](https://www.youtube.com/watch?v=jofORd02w0c)
 
+### SEIF-SLAM Maps Exchange
+
+Exchange between two robots of theirs information vectors and matrices, alongside with the occupancy grid map
+
+[![Watch the video](https://user-images.githubusercontent.com/12619298/233991362-912b6276-47c3-4d01-8b60-3b8de9a5cb6c.png)](https://youtu.be/h3TKFug_y1M)
 
 ---
 ## TODO
- - [ ] Videos
+ - [x] Videos
  - [ ] Docker image 
  - [ ] CLI examples
